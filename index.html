@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetingMind</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #faf8f5;
+  --warm: #f5f0e8;
+  --stone: #e8e0d4;
+  --mist: #d4cdc4;
+  --bark: #9c8e80;
+  --ink: #2c2420;
+  --ink2: #6b5c52;
+  --ink3: #a89890;
+  --rose: #c4786a;
+  --rose-light: #f0e4e0;
+  --rose-deep: #9a5248;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --mono: 'Geist Mono', monospace;
+}
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--serif);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+}
+header {
+  padding: 56px 0 64px;
+  text-align: center;
+  animation: fadeUp 0.8s ease both;
+}
+.wordmark {
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 300;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--bark);
+  margin-bottom: 32px;
+}
+.hero-title {
+  font-size: clamp(38px, 6vw, 66px);
+  font-weight: 300;
+  letter-spacing: -1px;
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.hero-title em { font-style: italic; color: var(--rose); }
+.hero-sub {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--ink2);
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.75;
+  font-style: italic;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 40px;
+}
+.divider-line { flex: 1; height: 1px; background: var(--stone); }
+.divider-mark { font-size: 14px; color: var(--mist); }
+.api-section { margin-bottom: 28px; animation: fadeUp 0.8s 0.1s ease both; }
+.field-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--bark);
+  margin-bottom: 10px;
+}
+input[type="password"] {
+  width: 100%;
+  background: white;
+  border: 1px solid var(--stone);
+  border-radius: 3px;
+  padding: 13px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input[type="password"]:focus {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(196,120,106,0.08);
+}
+input[type="password"]::placeholder { color: var(--mist); }
+.input-section { margin-bottom: 16px; animation: fadeUp 0.8s 0.2s ease both; }
+.transcript-wrap {
+  background: white;
+  border: 1px solid var(--stone);
+  border-radius: 3px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.transcript-wrap:focus-within {
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(196,120,106,0.08);
+}
+.transcript-top {
+  padding: 13px 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.transcript-hint { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--mist); text-transform: uppercase; }
+.char-pill { font-family: var(--mono); font-size: 10px; color: var(--mist); }
+textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 12px 16px 16px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--ink2);
+  resize: none;
+  min-height: 190px;
+}
+textarea::placeholder {
+  color: var(--mist);
+  font-style: italic;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 300;
+}
+.rec-bar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--rose-light);
+  background: var(--rose-light);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--rose-deep);
+}
+.rec-bar.show { display: flex; }
+.rec-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--rose); animation: blink 1s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.actions-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 48px;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+.btn-mic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid var(--stone);
+  border-radius: 3px;
+  padding: 13px 18px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-mic:hover { border-color: var(--bark); }
+.btn-mic.recording { background: var(--rose-light); border-color: var(--rose); color: var(--rose-deep); }
+.btn-run {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  padding: 13px 24px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--cream);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-run:hover { background: var(--rose-deep); border-color: var(--rose-deep); }
+.btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
+.processing { display: none; text-align: center; padding: 40px 0; }
+.processing.show { display: block; }
+.process-steps { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.p-step {
+  padding: 8px 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--mist);
+  border-bottom: 1px solid var(--stone);
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.p-step.active { color: var(--rose); border-bottom-color: var(--rose); }
+.p-step.done { color: var(--bark); border-bottom-color: var(--bark); }
+.p-num { font-size: 9px; opacity: 0.5; }
+.process-msg { font-size: 15px; font-style: italic; color: var(--ink2); font-weight: 300; margin-bottom: 12px; }
+.pulse-line { width: 40px; height: 1px; background: var(--rose); margin: 0 auto; animation: expand 1.5s ease-in-out infinite; }
+@keyframes expand { 0%,100%{width:20px;opacity:0.4} 50%{width:60px;opacity:1} }
+.results { display: flex; flex-direction: column; }
+.result-card {
+  border-top: 1px solid var(--stone);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.result-card.visible { opacity: 1; transform: translateY(0); }
+.result-card:last-child { border-bottom: 1px solid var(--stone); }
+.result-header {
+  padding: 20px 0 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.result-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--bark); }
+.result-num { font-family: var(--mono); font-size: 10px; color: var(--mist); margin-right: auto; }
+.btn-copy { background: none; border: none; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--mist); cursor: pointer; text-transform: uppercase; transition: color 0.2s; }
+.btn-copy:hover { color: var(--rose); }
+.result-body { padding-bottom: 28px; }
+.action-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+.action-table th { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); text-align: left; padding: 0 0 10px; border-bottom: 1px solid var(--stone); font-weight: 400; }
+.action-table th:not(:first-child) { padding-left: 16px; }
+.action-table td { padding: 11px 0; border-bottom: 1px solid rgba(232,224,212,0.5); color: var(--ink2); vertical-align: top; line-height: 1.5; }
+.action-table td:not(:first-child) { padding-left: 16px; }
+.action-table tr:last-child td { border-bottom: none; }
+.owner-tag { display: inline-block; background: var(--rose-light); color: var(--rose-deep); font-size: 10px; padding: 3px 8px; border-radius: 2px; }
+.deadline-tag { color: var(--bark); font-style: italic; font-size: 11px; }
+.summary-text { font-size: 16px; font-weight: 300; color: var(--ink2); line-height: 1.9; white-space: pre-wrap; }
+.email-text { font-family: var(--mono); font-size: 12px; font-weight: 300; color: var(--ink2); line-height: 1.9; white-space: pre-wrap; background: var(--warm); padding: 20px; border-radius: 2px; border-left: 2px solid var(--rose-light); }
+.empty { text-align: center; padding: 60px 0; color: var(--mist); }
+.empty-title { font-size: 22px; font-style: italic; font-weight: 300; margin-bottom: 8px; }
+.empty-sub { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+footer {
+  margin-top: 80px;
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+.footer-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+.footer-inner { text-align: center; padding-bottom: 60px; }
+.footer-built {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.footer-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--mist);
+}
+.footer-name {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: -0.3px;
+  border-bottom: 1px solid var(--rose-light);
+  transition: border-color 0.2s, color 0.2s;
+}
+.footer-name:hover { color: var(--rose); border-bottom-color: var(--rose); }
+.footer-note {
+  font-size: 16px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ink2);
+  line-height: 1.8;
+  max-width: 380px;
+  margin: 0 auto 28px;
+}
+.footer-note em { color: var(--rose); }
+.footer-tags {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.f-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--bark);
+  border: 1px solid var(--stone);
+  padding: 5px 12px;
+  border-radius: 2px;
+  background: white;
+}
+.footer-copy {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--mist);
+}
+@media (max-width: 600px) {
+  .app { padding: 0 16px 80px; }
+  header { padding: 40px 0 48px; }
+  .hero-title { font-size: 36px; }
+  .actions-row { flex-direction: column; }
+  .btn-mic { justify-content: center; }
+  .action-table th:last-child, .action-table td:last-child { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="wordmark">MeetingMind</div>
+    <h1 class="hero-title">Your meetings,<br><em>clarified.</em></h1>
+    <p class="hero-sub">Speak or paste any transcript. Receive action items, a summary, and a follow-up email — instantly.</p>
+  </header>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-mark">◆</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="api-section">
+    <label class="field-label" for="apiKey">Anthropic API Key</label>
+    <input type="password" id="apiKey" placeholder="sk-ant-api03-…" autocomplete="off" />
+  </div>
+
+  <div class="input-section">
+    <label class="field-label">Meeting Transcript</label>
+    <div class="transcript-wrap">
+      <div class="transcript-top">
+        <span class="transcript-hint">paste or dictate</span>
+        <span class="char-pill" id="charCount">0 chars</span>
+      </div>
+      <textarea id="transcript" placeholder="Begin typing, or press Record to speak your meeting transcript…"></textarea>
+      <div class="rec-bar" id="recBar">
+        <div class="rec-dot"></div>
+        <span id="recTime">Recording — 0s</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions-row">
+    <button class="btn-mic" id="micBtn" onclick="toggleMic()">
+      <span id="micIcon">○</span>
+      <span id="micLabel">Record</span>
+    </button>
+    <button class="btn-run" id="runBtn" onclick="runAgent()">
+      <span id="runLabel">Analyze Meeting</span>
+    </button>
+  </div>
+
+  <div class="processing" id="processing">
+    <div class="process-steps">
+      <div class="p-step" id="ps1"><span class="p-num">01</span>Actions</div>
+      <div class="p-step" id="ps2"><span class="p-num">02</span>Summary</div>
+      <div class="p-step" id="ps3"><span class="p-num">03</span>Email</div>
+    </div>
+    <div class="process-msg" id="processMsg">Listening to your meeting…</div>
+    <div class="pulse-line"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="empty" id="emptyState">
+      <div class="empty-title">Nothing here yet</div>
+      <div class="empty-sub">paste a transcript above to begin</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-divider">
+      <div class="divider-line"></div>
+      <div class="divider-mark">◆</div>
+      <div class="divider-line"></div>
+    </div>
+    <div class="footer-inner">
+      <div class="footer-built">
+        <span class="footer-label">Built by</span>
+        <a class="footer-name" href="https://linkedin.com/in/shrutimandaokar" target="_blank">Shruti Mandaokar</a>
+      </div>
+      <p class="footer-note">
+        Made on day one after graduation —<br>not for a job, not for a grade.<br>
+        <em>For the love of building things that matter.</em>
+      </p>
+      <div class="footer-tags">
+        <span class="f-tag">agentic ai</span>
+        <span class="f-tag">claude api</span>
+        <span class="f-tag">day 1</span>
+        <span class="f-tag">san carlos, ca</span>
+      </div>
+      <p class="footer-copy">© 2026 Shruti Mandaokar · MeetingMind</p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const textarea = document.getElementById('transcript');
+const charCountEl = document.getElementById('charCount');
+const runBtn = document.getElementById('runBtn');
+const runLabel = document.getElementById('runLabel');
+const micBtn = document.getElementById('micBtn');
+const micLabel = document.getElementById('micLabel');
+const micIcon = document.getElementById('micIcon');
+const recBar = document.getElementById('recBar');
+const recTimeEl = document.getElementById('recTime');
+const processingEl = document.getElementById('processing');
+const processMsgEl = document.getElementById('processMsg');
+const resultsEl = document.getElementById('results');
+
+let recognition, isRecording = false, recSecs = 0, recTimer;
+
+textarea.addEventListener('input', () => {
+  charCountEl.textContent = textarea.value.length + ' chars';
+});
+
+function toggleMic() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    alert('Voice recognition requires Chrome on desktop.'); return;
+  }
+  if (isRecording) { recognition.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onstart = () => {
+    isRecording = true;
+    micBtn.classList.add('recording');
+    micIcon.textContent = '●';
+    micLabel.textContent = 'Stop';
+    recBar.classList.add('show');
+    recSecs = 0;
+    recTimer = setInterval(() => { recSecs++; recTimeEl.textContent = `Recording — ${recSecs}s`; }, 1000);
+  };
+  recognition.onresult = (e) => {
+    let t = '';
+    for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+    textarea.value = t;
+    charCountEl.textContent = t.length + ' chars';
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    micIcon.textContent = '○';
+    micLabel.textContent = 'Record';
+    recBar.classList.remove('show');
+    clearInterval(recTimer);
+  };
+  recognition.start();
+}
+
+function setStep(n) {
+  ['ps1','ps2','ps3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if (i + 1 < n) el.classList.add('done');
+    else if (i + 1 === n) el.classList.add('active');
+  });
+}
+
+async function callClaude(apiKey, prompt) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5',
+      max_tokens: 1000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'API error');
+  return data.content[0].text;
+}
+
+function parseActions(text) {
+  try { return JSON.parse(text.match(/\[[\s\S]*\]/)[0]); } catch { return null; }
+}
+
+function makeCard(id, label, num, bodyFn, delay) {
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <div class="result-header">
+      <span class="result-label">${label}</span>
+      <span class="result-num">${num}</span>
+      <button class="btn-copy" onclick="copyCard('${id}')">Copy</button>
+    </div>
+    <div class="result-body" id="${id}-body"></div>
+  `;
+  resultsEl.appendChild(card);
+  bodyFn(document.getElementById(id + '-body'));
+  setTimeout(() => card.classList.add('visible'), delay);
+}
+
+function copyCard(id) {
+  navigator.clipboard.writeText(document.getElementById(id + '-body').innerText);
+  const btn = document.querySelector(`[onclick="copyCard('${id}')"]`);
+  btn.textContent = 'Copied';
+  setTimeout(() => btn.textContent = 'Copy', 1500);
+}
+
+async function runAgent() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const transcript = textarea.value.trim();
+  if (!apiKey) { alert('Please enter your Anthropic API key.'); return; }
+  if (!transcript) { alert('Please enter a meeting transcript.'); return; }
+
+  runBtn.disabled = true;
+  runLabel.textContent = 'Analyzing…';
+  resultsEl.innerHTML = '';
+  processingEl.classList.add('show');
+  setStep(0);
+
+  try {
+    setStep(1);
+    processMsgEl.textContent = 'Extracting action items…';
+    const actionText = await callClaude(apiKey,
+      `Extract all action items from this transcript. Return ONLY a valid JSON array. Each item must have: "owner", "task", "deadline". No explanation, no markdown fences, just the raw JSON array.\n\n${transcript}`
+    );
+    const actions = parseActions(actionText);
+
+    setStep(2);
+    processMsgEl.textContent = 'Distilling key moments…';
+    const summary = await callClaude(apiKey,
+      `Summarize this meeting in exactly 3 concise bullet points using the • character: key decisions, blockers, and next steps. Be specific.\n\n${transcript}`
+    );
+
+    setStep(3);
+    processMsgEl.textContent = 'Composing your follow-up…';
+    const email = await callClaude(apiKey,
+      `Write a professional, warm follow-up email. Start with "Subject: ..." on the first line, then a blank line, then the email body. Include decisions, action items, and a warm closing. Keep it concise.\n\nSummary: ${summary}\nActions: ${actionText}`
+    );
+
+    processingEl.classList.remove('show');
+
+    makeCard('c-actions', 'Action Items', '01', (el) => {
+      if (actions && actions.length) {
+        const t = document.createElement('table');
+        t.className = 'action-table';
+        t.innerHTML = `<thead><tr><th>Owner</th><th>Task</th><th>By</th></tr></thead><tbody>
+          ${actions.map(a => `<tr>
+            <td><span class="owner-tag">${a.owner}</span></td>
+            <td>${a.task}</td>
+            <td><span class="deadline-tag">${a.deadline}</span></td>
+          </tr>`).join('')}
+        </tbody>`;
+        el.appendChild(t);
+      } else {
+        el.innerHTML = `<p class="summary-text">${actionText}</p>`;
+      }
+    }, 80);
+
+    makeCard('c-summary', 'Summary', '02', (el) => {
+      el.innerHTML = `<p class="summary-text">${summary}</p>`;
+    }, 200);
+
+    makeCard('c-email', 'Follow-up Email', '03', (el) => {
+      el.innerHTML = `<div class="email-text">${email}</div>`;
+    }, 320);
+
+  } catch(err) {
+    processingEl.classList.remove('show');
+    const e = document.createElement('div');
+    e.style.cssText = 'padding:16px; font-family:var(--mono); font-size:12px; color:var(--rose-deep); border-left:2px solid var(--rose); background:var(--rose-light); border-radius:2px;';
+    e.textContent = 'Error: ' + err.message;
+    resultsEl.appendChild(e);
+  }
+
+  runBtn.disabled = false;
+  runLabel.textContent = 'Analyze Meeting';
+}
+</script>
+</body>
+</html>
