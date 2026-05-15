@@ -13,12 +13,15 @@ Built on day one after graduation. Not for a job, not for a grade. For the love 
 MeetingMind runs your transcript through a 3-step AI agent pipeline:
 
 **01 — Extract Action Items**
+
 Identifies every task, assigns it to an owner, and sets a deadline. Rendered as a clean, scannable table.
 
 **02 — Summarize**
+
 Distills the entire meeting into 3 focused bullet points — key decisions made, blockers, and next steps.
 
 **03 — Draft Follow-up Email**
+
 Writes a warm, professional follow-up email ready to send to your team. Subject line included.
 
 ---
@@ -119,7 +122,7 @@ I built the first version in a single evening, on day one after graduating, in S
 
 ## Built by
 
-**Shruti Mandaokar** — [LinkedIn](https://linkedin.com/in/shrutimandaokar) · [GitHub](https://github.com/YOUR_USERNAME)
+**Shruti Mandaokar** — [LinkedIn](https://linkedin.com/in/shrutimandaokar) · [GitHub](https://github.com/Shruti2301)
 
 ---
 
